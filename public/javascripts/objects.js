@@ -45,6 +45,12 @@ class Paddle {
 		rect(this.x, this.y, PADDLE_THICKNESS, PADDLE_LENGTH);
 	}
 
+	set(x,y) {
+		this.x = x;
+		this.y = y;
+		this.draw();
+	}
+
 	rescale() {
 		switch (this.id) {
 			case 0: {

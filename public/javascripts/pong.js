@@ -90,18 +90,35 @@ function draw() {
 	drawFrame();
 }
 
+function NORMALIZER(x,y){
+	return {x:x/Width,y:y/Height};
+}
 
+function DENORMALIZER(x,y){
+	return {x:x*Width,y:y*Height};
+}
 
 function drawFrame() {
 	arena.draw();
 	handleInput();
 	paddles.forEach(paddle => {
-		paddle.draw();
+		if(paddle.id === ID){
+			paddle.draw();
+		}else{
+			let dValues = DENORMALIZER(pos.paddles[ID === 1?0:1].x,pos.paddles[ID === 1?0:1].y);
+			paddle.set(dValues.x,dValues.y);
+			console.log(dValues);
+		}
 	});
+	let nValues = NORMALIZER(paddles[ID].x,paddles[ID].y);
+	pos.paddles[ID].x = nValues.x;
+	pos.paddles[ID].y = nValues.y;
 	if(ball){
 		ball.move();
 		ball.physX(arena, paddles);
 		ball.draw();
+		pos.ball.x = ball.x;
+		pos.ball.y = ball.y;
 		if(ball.x < arena.xMin || ball.x > arena.xMax){
 			ball = null;
 		}
@@ -109,6 +126,7 @@ function drawFrame() {
 	else{
 		ball = new Ball(arena.centerX, arena.centerY, 50, randomX(),randomY(), BALL_SPEED);
 	}
+
 }
 
 function randomX(){

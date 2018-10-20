@@ -81,7 +81,7 @@ io.on('connection', function (socket) {
         p1Socket = socketObjForClientWithID(p1.id).socket;
         p2Socket = socketObjForClientWithID(p2.id).socket;
         // we create a new session object with the required data 
-        let session = { id: sessionCount++, p1: p1, p2: p2, p1score: 0, p2score: 0, p1ID:p1.id, p2ID:p2.id, pos:{ball:{x:0.5,y:0.5},paddle0:{x:0,y:0.5},paddle1:{x:1,y:0.5}},  p1Socket: p1Socket, p2Socket: p2Socket };
+        let session = { id: sessionCount++, p1: p1, p2: p2, p1score: 0, p2score: 0, p1ID:p1.id, p2ID:p2.id, pos:{ball:{x:0.5,y:0.5},paddles:[{x:0,y:0.5},{x:1,y:0.5}]},  p1Socket: p1Socket, p2Socket: p2Socket };
 
         // client copy of the server session that we will be sending to both players
         let syncData = { id: session.id,  p1score: session.p1score, p2score: session.p2score,  p1ID: session.p1ID, p2ID: session.p2ID, pos:session.pos};
@@ -104,43 +104,10 @@ io.on('connection', function (socket) {
         let session;
         // First we find the game session where our client is playing
         session = sessionObjForID(moveData.id, true);
-        // we check who played and then assign the next turn
-        if (moveData.client.id === session.p1.id) {
-            session.turn = session.p2.id;
-        }
-        else if (moveData.client.id === session.p2.id) {
-            session.turn = session.p1.id;
-        }
-        else {
-            sendError("Unauthorized Move Performed");
-            return;
-        }
+        session.pos = moveData.pos;
         // we synchronize the grid data from the client
-        session.grid[moveData.move] = moveData.client.id;
-        // we check for a winner
-        let winner = winCheck(session.grid, -1);
-        let winID = winner.winner;
-        // if there is a winner we increment the score for them and then reset the game
-        if (winID != -1 && winID != -2) {
-            if (winID == session.p1.id) {
-                session.xscore++;
-            }
-            else {
-                session.oscore++;
-            }
-            console.log("Session#: " + session.id + " Player with Client ID: " + winID + " Won");
-            // we tell that the game is over and that a winner has been declared
-            session.turn = -1;
-        }
-        // if there is no winner we just repackage the updated values into a new game session and send a copy to the clients and push a copy back to the master database
-        else {
-            // Handle Ties
-            if (winID === -2) {
-                session.turn = -2;
-                console.log("Handling Tie for session#: " + moveData.id);
-            }
-        }
-        let syncData = { id: session.id, grid: session.grid, turn: session.turn, xscore: session.xscore, oscore: session.oscore };
+        let syncData = { id: session.id,  p1score: session.p1score, p2score: session.p2score,  p1ID: session.p1ID, p2ID: session.p2ID, pos:session.pos};
+
         session.p1Socket.emit('syncClient', { session: syncData });
         session.p2Socket.emit('syncClient', { session: syncData });
         sessions.push(session);

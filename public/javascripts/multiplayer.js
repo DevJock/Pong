@@ -101,6 +101,10 @@ function PLAY(opponent) {
 	socket.emit('startGame', { client: clientData, opponent: opponent });
 }
 
+function SYNC(){
+	socket.emit('sync', { id: sessionID, pos:pos});
+}
+
 function REFRESH(){
 	socket.emit('updates');
 }
