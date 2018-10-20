@@ -82,18 +82,19 @@ class Paddle {
 
 
 class Ball {
-	constructor(x, y, size, dx, dy) {
+	constructor(x, y, size, dx, dy, speed) {
 		this.x = x;
 		this.y = y;
 		this.dx = dx;
 		this.dy = dy;
+		this.speed = speed;
 		this.size = size;
 		this.radius = size / 2;
 	}
 
 	move() {
-		this.x += this.dx;
-		this.y += this.dy;
+		this.x += this.dx * this.speed;
+		this.y += this.dy * this.speed;
 	}
 
 	draw() {

@@ -12,14 +12,7 @@ var CLIENTS = [];
 var PLAYERS = [];
 var connected = false;
 var sessionID;
-var symbol;
-var opponentSymbol;
-var opponentID;
-var turn;
-var xScore;
-var oScore;
-
-var t = [];
+var pos;
 var NAME;
 
 let scope = angular.element(document.getElementById("view")).scope();
@@ -59,20 +52,16 @@ socket.on('update', function (server) {
 });
 
 socket.on('play', function (server) {
-	t = server.session.grid;
-	xScore = server.session.xscore;
-	oScore = server.session.oscore;
-	turn = server.session.turn;
+	opponentData = server.session.p2;
+	p1Score = server.session.p1score;
+	p2Score = server.session.p2score;
+	pos = server.session.pos;
 	sessionID = server.session.id;
-	if (server.session.x == clientData.id) {
-		symbol = "X";
-		opponentSymbol = "O";
-		opponentID = server.session.o;
+	if (server.session.p1.id === clientData.id) {
+		ID = 0;
 	}
 	else {
-		opponentID = server.session.x;
-		symbol = "O";
-		opponentSymbol = "X";
+		ID = 1;
 	}
 	scope.game();
 	scope.updateUI();
@@ -82,14 +71,10 @@ socket.on('play', function (server) {
 
 socket.on('syncClient', function (server) {
 	console.log("Syncing");
-	t = server.session.grid;
-	xScore = server.session.xscore;
-	oScore = server.session.oscore;
-	turn = server.session.turn;
-	if (turn === -1) {
-		socket.emit('reset', { id: sessionID });
-	}
-	else if(turn === -2){
+	p1Score = server.session.p1score;
+	p2Score = server.session.p2score;
+	pos = server.session.pos;
+	if (!pos) {
 		socket.emit('reset', { id: sessionID });
 	}
 	scope.updateUI();
@@ -99,8 +84,8 @@ socket.on('syncClient', function (server) {
 
 socket.on('end', function (server) {
 	console.log("GameOver");
-	xScore = server.xscore;
-	oScore = server.oscore;
+	p1Score = server.session.p1score;
+	p2Score = server.session.p2score;
 	scope.displayScore();
 	scope.$apply();
 });

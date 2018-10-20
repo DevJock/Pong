@@ -7,6 +7,10 @@
 let PADDLE_LENGTH = 100;
 let PADDLE_THICKNESS = 20;
 
+
+let BALL_SPEED = 5;
+let PADDLE_SPEED = 5;
+
 var baseSize = {
 	w: 720,
 	h: 1280
@@ -24,7 +28,9 @@ let arena;
 let ball;
 let paddles = [];
 
-function setup() {
+let gameStarted = false;
+
+function STARTGAME() {
 	canvasHolder = document.getElementById("canvasHolder");
 	let w = canvasHolder.offsetWidth;
 	let h = canvasHolder.offsetHeight;
@@ -36,9 +42,10 @@ function setup() {
 	angleMode(DEGREES);
 	frameRate(60);
 	arena = new Arena(1);
-	paddles.push(new Paddle(0, arena, 5));
-	paddles.push(new Paddle(1, arena, 5));
+	paddles.push(new Paddle(paddles.length, arena, PADDLE_SPEED));
+	paddles.push(new Paddle(paddles.length, arena, PADDLE_SPEED));
 	rescale();
+	gameStarted = true;
 }
 
 function rescale() {
@@ -67,11 +74,9 @@ function handleInput() {
 	if (keyIsPressed) {
 		if (keyCode === UP_ARROW) {
 			paddles[ID].move(0, -1);
-			paddles[1].move(0, -1);
 		}
 		else if (keyCode === DOWN_ARROW) {
 			paddles[ID].move(0, 1);
-			paddles[1].move(0, 1);
 		}
 	}
 }
@@ -79,6 +84,9 @@ function handleInput() {
 
 
 function draw() {
+	if(!gameStarted){
+		return;
+	}
 	background(0);
 	drawFrame();
 }
@@ -95,13 +103,20 @@ function drawFrame() {
 		ball.move();
 		ball.physX(arena, paddles);
 		ball.draw();
+		if(ball.x < arena.xMin || ball.x > arena.xMax){
+			ball = null;
+		}
 	}
 	else{
-		ball = new Ball(arena.centerX, arena.centerY, 50, random(-10,10),random(-10,10));
+		ball = new Ball(arena.centerX, arena.centerY, 50, randomX(),randomY(), BALL_SPEED);
 	}
 }
 
-function random(min,max){
-	return Math.random()*max + min;
+function randomX(){
+	return Math.random() > 0.5 ? -1 : 1;
+}
+
+function randomY(){
+	return Math.random() > 0.5 ? -1 : 1;
 }
 

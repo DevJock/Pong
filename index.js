@@ -1,5 +1,5 @@
 /**
- * XOde Server Based TicTacToe Implementation
+ * PONGre Server Based PONG Implementation
  * © 2018 Chiraag Bangera.
  * This file contains all the Server side Networking code and also contains the main server side logic for the game.
 */
@@ -81,10 +81,10 @@ io.on('connection', function (socket) {
         p1Socket = socketObjForClientWithID(p1.id).socket;
         p2Socket = socketObjForClientWithID(p2.id).socket;
         // we create a new session object with the required data 
-        let session = { id: sessionCount++, p1: p1, p2: p2, xscore: 0, oscore: 0, turn: p1.id, grid: [-1, -1, -1, -1, -1, -1, -1, -1, -1], x: p1.id, o: p2.id, p1Socket: p1Socket, p2Socket: p2Socket };
+        let session = { id: sessionCount++, p1: p1, p2: p2, p1score: 0, p2score: 0, p1ID:p1.id, p2ID:p2.id, pos:{ball:{x:0.5,y:0.5},paddle0:{x:0,y:0.5},paddle1:{x:1,y:0.5}},  p1Socket: p1Socket, p2Socket: p2Socket };
 
         // client copy of the server session that we will be sending to both players
-        let syncData = { id: session.id, turn: session.turn, xscore: session.xscore, oscore: session.oscore, grid: session.grid, x: session.x, o: session.o };
+        let syncData = { id: session.id,  p1score: session.p1score, p2score: session.p2score,  p1ID: session.p1ID, p2ID: session.p2ID, pos:session.pos};
 
         // every client waiting for a game gets a new updated clients database and also a list of players currently active in a session
         updateClients();
