@@ -57,14 +57,13 @@ socket.on('play', function (server) {
 	p2Score = server.session.p2score;
 	pos = server.session.pos;
 	sessionID = server.session.id;
-	if (server.session.p1.id === clientData.id) {
+	if (server.session.p1ID === clientData.id) {
 		ID = 0;
 	}
 	else {
 		ID = 1;
 	}
 	scope.game();
-	scope.updateUI();
 	scope.$apply();
 });
 
@@ -77,8 +76,6 @@ socket.on('syncClient', function (server) {
 	if (!pos) {
 		socket.emit('reset', { id: sessionID });
 	}
-	scope.updateUI();
-	scope.$apply();
 });
 
 

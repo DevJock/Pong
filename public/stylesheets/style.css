@@ -1,0 +1,29 @@
+/*
+	XOde Server Based TicTacToe Implementation
+ 	© 2018 Chiraag Bangera.
+  The CSS file for the whole web application
+*/
+
+body, html{
+  height: 100%;
+  margin: auto;
+  font-size: 1rem;
+}
+
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: black;
+  color: white;
+  
+}
+
+.content{
+  width: 100%;
+  height: 100%;
+}
+
+.template{
+  width: 100%;
+  height: auto;
+  margin: auto;
+}

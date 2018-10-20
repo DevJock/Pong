@@ -11,10 +11,6 @@ let PADDLE_THICKNESS = 20;
 let BALL_SPEED = 5;
 let PADDLE_SPEED = 5;
 
-var baseSize = {
-	w: 720,
-	h: 1280
-}
 let canvasHolder;
 let gameCanvas;
 let scale;
@@ -64,6 +60,9 @@ function rescale() {
 
 
 function windowResized() {
+	if(!gameStarted){
+		return;
+	}
 	let w = canvasHolder.offsetWidth;
 	let h = canvasHolder.offsetHeight;
 	resizeCanvas(w, h);
