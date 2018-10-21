@@ -88,7 +88,8 @@ class Paddle {
 
 
 class Ball {
-	constructor(x, y, size, dx, dy, speed) {
+	constructor(id, x, y, size, dx, dy, speed) {
+		this.id = id;
 		this.x = x;
 		this.y = y;
 		this.dx = dx;
@@ -101,6 +102,12 @@ class Ball {
 	move() {
 		this.x += this.dx * this.speed;
 		this.y += this.dy * this.speed;
+	}
+	
+	set(x,y){
+		this.x = x;
+		this.y = y;
+		this.draw();
 	}
 
 	draw() {

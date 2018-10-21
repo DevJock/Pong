@@ -60,7 +60,7 @@ function rescale() {
 
 
 function windowResized() {
-	if(!gameStarted){
+	if (!gameStarted) {
 		return;
 	}
 	let w = canvasHolder.offsetWidth;
@@ -83,57 +83,61 @@ function handleInput() {
 
 
 function draw() {
-	if(!gameStarted){
+	if (!gameStarted) {
 		return;
 	}
 	background(0);
 	drawFrame();
+	SYNC();
 }
 
-function NORMALIZER(x,y){
-	return {x:x/Width,y:y/Height};
+function NORMALIZER(x, y) {
+	return { x: x / Width, y: y / Height };
 }
 
-function DENORMALIZER(x,y){
-	return {x:x*Width,y:y*Height};
+function DENORMALIZER(x, y) {
+	return { x: x * Width, y: y * Height };
 }
 
 function drawFrame() {
 	arena.draw();
 	handleInput();
 	paddles.forEach(paddle => {
-		if(paddle.id === ID){
+		if (paddle.id === ID) {
 			paddle.draw();
-		}else{
-			let dValues = DENORMALIZER(pos.paddles[ID === 1?0:1].x,pos.paddles[ID === 1?0:1].y);
-			paddle.set(dValues.x,dValues.y);
-			console.log(dValues);
+		} else {
+			let dValues = DENORMALIZER(pos.paddles[ID === 1 ? 0 : 1].x, pos.paddles[ID === 1 ? 0 : 1].y);
+			paddle.set(dValues.x, dValues.y);
 		}
 	});
-	let nValues = NORMALIZER(paddles[ID].x,paddles[ID].y);
+	let nValues = NORMALIZER(paddles[ID].x, paddles[ID].y);
 	pos.paddles[ID].x = nValues.x;
 	pos.paddles[ID].y = nValues.y;
-	if(ball){
+	if(!ball){
+		let dValues = DENORMALIZER(pos.ball.x, pos.ball.y);
+		ball = new Ball(ID,dValues.x,dValues.y, 50, randomX(), randomY(), BALL_SPEED);
+	}
+	if (ball.id === ID && ID === 0) {
 		ball.move();
 		ball.physX(arena, paddles);
 		ball.draw();
-		pos.ball.x = ball.x;
-		pos.ball.y = ball.y;
-		if(ball.x < arena.xMin || ball.x > arena.xMax){
+		let nValues = NORMALIZER(ball.x, ball.y);
+		pos.ball.x = nValues.x;
+		pos.ball.y = nValues.y;
+		if (ball.x < arena.xMin || ball.x > arena.xMax) {
 			ball = null;
 		}
+	}else{
+		let dValues = DENORMALIZER(pos.ball.x, pos.ball.y);
+		ball.set(dValues.x,dValues.y);
 	}
-	else{
-		ball = new Ball(arena.centerX, arena.centerY, 50, randomX(),randomY(), BALL_SPEED);
-	}
-
 }
 
-function randomX(){
+function randomX() {
 	return Math.random() > 0.5 ? -1 : 1;
 }
 
-function randomY(){
+function randomY() {
 	return Math.random() > 0.5 ? -1 : 1;
 }
 

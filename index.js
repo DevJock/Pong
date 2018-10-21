@@ -81,14 +81,13 @@ io.on('connection', function (socket) {
         p1Socket = socketObjForClientWithID(p1.id).socket;
         p2Socket = socketObjForClientWithID(p2.id).socket;
         // we create a new session object with the required data 
-        let session = { id: sessionCount++, p1: p1, p2: p2, p1score: 0, p2score: 0, p1ID:p1.id, p2ID:p2.id, pos:{ball:{x:0.5,y:0.5},paddles:[{x:0,y:0.5},{x:1,y:0.5}]},  p1Socket: p1Socket, p2Socket: p2Socket };
+        let session = { id: sessionCount++, p1: p1, p2: p2, p1score: 0, p2score: 0, p1ID: 0, p2ID: 1, pos: { ball: { x: 0.5, y: 0.5 }, paddles: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] }, p1Socket: p1Socket, p2Socket: p2Socket };
 
         // client copy of the server session that we will be sending to both players
-        let syncData = { id: session.id,  p1score: session.p1score, p2score: session.p2score,  p1ID: session.p1ID, p2ID: session.p2ID, pos:session.pos};
+        let syncData = { id: session.id, p1:session.p1,p2: session.p2, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
 
         // every client waiting for a game gets a new updated clients database and also a list of players currently active in a session
         updateClients();
-
         // we start the session for our two active players
         p1Socket.emit('play', { session: syncData });
         p2Socket.emit('play', { session: syncData });
@@ -100,13 +99,16 @@ io.on('connection', function (socket) {
 
     // here is where we sync the game with our two connected players
     socket.on('sync', function (moveData) {
-        console.log("Server Syncing for session#: " + moveData.id);
         let session;
         // First we find the game session where our client is playing
         session = sessionObjForID(moveData.id, true);
+        if (!session) {
+            console.log("Error Session Doesn't Exist: " + moveData);
+            return;
+        }
         session.pos = moveData.pos;
         // we synchronize the grid data from the client
-        let syncData = { id: session.id,  p1score: session.p1score, p2score: session.p2score,  p1ID: session.p1ID, p2ID: session.p2ID, pos:session.pos};
+        let syncData = { id: session.id, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
 
         session.p1Socket.emit('syncClient', { session: syncData });
         session.p2Socket.emit('syncClient', { session: syncData });
@@ -138,7 +140,7 @@ io.on('connection', function (socket) {
         // get socket details
         disconnectedSocket = socketObjForSocket(socket, true);
 
-        if(!disconnectedSocket){
+        if (!disconnectedSocket) {
             return;
         }
         // finding out if they quit from an active session
@@ -153,7 +155,7 @@ io.on('connection', function (socket) {
         // If session details found we do the appropriate updates to the database
         if (session) {
             // we transfer the opponent to active database and send him updates
-            let client = playerObjForID(removedClient.id === session.p1.id ? session.p2.id: session.p1.id, true);
+            let client = playerObjForID(removedClient.id === session.p1.id ? session.p2.id : session.p1.id, true);
             clients.push(client);
             socketObjForClientWithID(client.id).socket.emit('end', { xscore: session.xscore, oscore: session.oscore });
             updateClients();
@@ -167,8 +169,8 @@ io.on('connection', function (socket) {
         updateClients();
     });
 
-    socket.on('error',function(e){
-        console.log("Socket Error"+e);
+    socket.on('error', function (e) {
+        console.log("Socket Error" + e);
     })
 
 
@@ -270,7 +272,7 @@ function socketObjForSocket(socket, splice = false) {
 
 
 function validateNAME(str) {
-    if(str == undefined){
+    if (str == undefined) {
         return false;
     }
     str = str.trim();
@@ -279,43 +281,4 @@ function validateNAME(str) {
         return true;
     }
     return false;
-}
-
-function winCheck(data, empty) {
-    if (data[0] === data[1] && data[0] === data[2] && data[0] != empty) {
-        return { pos: [0, 1, 2], winner: data[0] };
-    }
-
-    else if (data[3] === data[4] && data[3] === data[5] && data[3] != empty) {
-        return { pos: [3, 4, 5], winner: data[3] };
-    }
-
-    else if (data[6] === data[7] && data[6] === data[8] && data[6] != empty) {
-        return { pos: [6, 7, 8], winner: data[6] };
-    }
-    else if (data[0] === data[3] && data[0] === data[6] && data[0] != empty) {
-        return { pos: [0, 3, 6], winner: data[0] };
-    }
-
-    else if (data[1] === data[4] && data[1] === data[7] && data[1] != empty) {
-        return { pos: [1, 4, 7], winner: data[1] };
-    }
-
-    else if (data[2] == data[5] && data[2] == data[8] && data[2] != empty) {
-        return { pos: [2, 5, 8], winner: data[2] };
-    }
-
-    else if (data[0] == data[4] && data[0] == data[8] && data[0] != empty) {
-        return { pos: [0, 4, 8], winner: data[0] };
-    }
-
-    else if (data[2] == data[4] && data[2] == data[6] && data[2] != empty) {
-        return { pos: [2, 4, 6], winner: data[2] };
-    }
-    for (let i = 0; i < data.length; i++) {
-        if (data[i] === empty) {
-            return { winner: -1, pos: null };
-        }
-    }
-    return { winner: -2, pos: null }
 }

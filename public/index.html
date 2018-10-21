@@ -44,7 +44,7 @@
 			</div>
 		</div>
 	</div>
-	<div id="message" class="jumbotron jumbotron-fluid" style="display:none; background: rgb(30, 30, 30)">
+	<div id="message" class="jumbotron jumbotron-fluid" style="display:block; background: rgb(30, 30, 30)">
 		<div class="container text-center">
 			<h1 class="display-4">Potrait Not Supported</h1>
 			<p class="lead">Use in Landscape orientation.</p>
@@ -62,22 +62,25 @@
 
 	function doOnOrientationChange() {
 		switch (window.orientation) {
-			case -90 || 90:
-				alert('COOL. Mobile in landscape. Proceding..');
+			case -90:
+			case 90:
 				document.getElementById("app").style.display = "block";
-				document.getElementById("message").style.display = "block";
+				document.getElementById("message").style.display = "none";
 				break;
 			default:
-				alert('ERROR: Mobile in Potrait');
+				document.getElementById("app").style.display = "none";
+				document.getElementById("message").style.display = "block";
 				break;
 		}
 	}
 
 	if (mobilecheck()) {
 		console.log("Mobile Detected");
+		doOnOrientationChange();
 		window.addEventListener('orientationchange', doOnOrientationChange);
 	} else {
 		document.getElementById("app").style.display = "block";
+		document.getElementById("message").style.display = "none";
 	}
 
 
