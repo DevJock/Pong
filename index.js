@@ -103,33 +103,15 @@ io.on('connection', function (socket) {
         // First we find the game session where our client is playing
         session = sessionObjForID(moveData.id, true);
         if (!session) {
-            console.log("Error Session Doesn't Exist: " + moveData);
             return;
         }
         session.pos = moveData.pos;
         // we synchronize the grid data from the client
-        let syncData = { id: session.id, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
-
+        let syncData = { id: session.id, p1:session.p1,p2: session.p2, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
         session.p1Socket.emit('syncClient', { session: syncData });
         session.p2Socket.emit('syncClient', { session: syncData });
         sessions.push(session);
     });
-
-    // here is where we handle server reset
-    socket.on('reset', function (data) {
-        let session;
-        // we search and get the session from our master db
-        session = sessionObjForID(data.id, true);
-        // we reset the game for this session
-        session.turn = session.p1.id;
-        session.grid = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
-        let syncData = { id: session.id, grid: session.grid, turn: session.turn, xscore: session.xscore, oscore: session.oscore };
-        session.p1Socket.emit('syncClient', { session: syncData });
-        session.p2Socket.emit('syncClient', { session: syncData });
-        sessions.push(session);
-        console.log("Restarting Game Session#: " + session.id + " with " + session.p1.id + " and " + session.p2.id);
-    });
-
 
     // Logic to handle client disconnects
     socket.on('disconnect', function () {
@@ -157,7 +139,7 @@ io.on('connection', function (socket) {
             // we transfer the opponent to active database and send him updates
             let client = playerObjForID(removedClient.id === session.p1.id ? session.p2.id : session.p1.id, true);
             clients.push(client);
-            socketObjForClientWithID(client.id).socket.emit('end', { xscore: session.xscore, oscore: session.oscore });
+            socketObjForClientWithID(client.id).socket.emit('exited', { p1score: session.p1score, p2score: session.p2score });
             updateClients();
             return;
         };

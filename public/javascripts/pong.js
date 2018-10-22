@@ -6,9 +6,10 @@
 
 let PADDLE_LENGTH = 100;
 let PADDLE_THICKNESS = 20;
+let BALL_SIZE = 50;
 
 
-let BALL_SPEED = 5;
+let BALL_SPEED = 3.5;
 let PADDLE_SPEED = 5;
 
 let canvasHolder;
@@ -24,7 +25,7 @@ let arena;
 let ball;
 let paddles = [];
 
-let gameStarted = false;
+var gameStarted = false;
 
 function STARTGAME() {
 	canvasHolder = document.getElementById("canvasHolder");
@@ -47,7 +48,7 @@ function STARTGAME() {
 function rescale() {
 	Width = gameCanvas.width;
 	Height = gameCanvas.height;
-	fSize = 100;
+	PADDLE_LENGTH = 0.15 * Height;
 	if (arena) {
 		arena.rescale();
 	}
@@ -83,21 +84,24 @@ function handleInput() {
 
 
 function draw() {
+	background(0);
 	if (!gameStarted) {
 		return;
 	}
-	background(0);
+	drawScore();
 	drawFrame();
 	SYNC();
 }
 
-function NORMALIZER(x, y) {
-	return { x: x / Width, y: y / Height };
+
+function drawScore(){
+	textSize(125);
+	fill(91);
+	stroke(0);
+	text(p1Score,Width/6,Height/6);
+	text(p1Score,Width/1.25,Height/6);
 }
 
-function DENORMALIZER(x, y) {
-	return { x: x * Width, y: y * Height };
-}
 
 function drawFrame() {
 	arena.draw();
@@ -114,8 +118,7 @@ function drawFrame() {
 	pos.paddles[ID].x = nValues.x;
 	pos.paddles[ID].y = nValues.y;
 	if(!ball){
-		let dValues = DENORMALIZER(pos.ball.x, pos.ball.y);
-		ball = new Ball(ID,dValues.x,dValues.y, 50, randomX(), randomY(), BALL_SPEED);
+		ball = new Ball(ID,arena.centerX,arena.centerY, randomX(), randomY(), BALL_SPEED);
 	}
 	if (ball.id === ID && ID === 0) {
 		ball.move();
@@ -124,7 +127,14 @@ function drawFrame() {
 		let nValues = NORMALIZER(ball.x, ball.y);
 		pos.ball.x = nValues.x;
 		pos.ball.y = nValues.y;
-		if (ball.x < arena.xMin || ball.x > arena.xMax) {
+		if (ball.x - ball.radius < arena.xMin){
+			p1Score++;
+			console.log("Lost Ball.");
+			ball = null;
+		}
+		else if(ball.x + ball.radius > arena.xMax) {
+			p2Score++;
+			console.log("Lost Ball.");
 			ball = null;
 		}
 	}else{
@@ -141,3 +151,10 @@ function randomY() {
 	return Math.random() > 0.5 ? -1 : 1;
 }
 
+function NORMALIZER(x, y) {
+	return { x: x / Width, y: y / Height };
+}
+
+function DENORMALIZER(x, y) {
+	return { x: x * Width, y: y * Height };
+}

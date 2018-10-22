@@ -78,6 +78,14 @@ socket.on('syncClient', function (server) {
 });
 
 
+socket.on('exited', function (server) {
+	console.log("Opponent Disconnected");
+	p1Score = server.p1score;
+	p2Score = server.p2score;
+	gameStarted = false;
+});
+
+
 socket.on('end', function (server) {
 	console.log("GameOver");
 	p1Score = server.session.p1score;
