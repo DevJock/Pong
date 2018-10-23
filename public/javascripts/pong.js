@@ -9,7 +9,7 @@ let PADDLE_THICKNESS = 20;
 let BALL_SIZE = 50;
 
 
-let BALL_SPEED = 3.5;
+let BALL_SPEED = 5;
 let PADDLE_SPEED = 5;
 
 let canvasHolder;
@@ -27,6 +27,7 @@ let paddles = [];
 
 var gameStarted = false;
 
+
 function STARTGAME() {
 	canvasHolder = document.getElementById("canvasHolder");
 	let w = canvasHolder.offsetWidth;
@@ -38,7 +39,7 @@ function STARTGAME() {
 	rectMode(CENTER);
 	angleMode(DEGREES);
 	frameRate(60);
-	arena = new Arena(1);
+	arena = new Arena(1,true);
 	paddles.push(new Paddle(paddles.length, arena, PADDLE_SPEED));
 	paddles.push(new Paddle(paddles.length, arena, PADDLE_SPEED));
 	rescale();
@@ -49,6 +50,7 @@ function rescale() {
 	Width = gameCanvas.width;
 	Height = gameCanvas.height;
 	PADDLE_LENGTH = 0.15 * Height;
+	fSize = 0.07 * Width;
 	if (arena) {
 		arena.rescale();
 	}
@@ -81,7 +83,14 @@ function handleInput() {
 	}
 }
 
-
+function touchMoved() {
+	if(mouseY < pmouseY){
+		paddles[ID].move(0, -1);
+	}else{
+		paddles[ID].move(0, 1);
+	}
+	return false;
+}
 
 function draw() {
 	background(0);
@@ -93,13 +102,12 @@ function draw() {
 	SYNC();
 }
 
-
 function drawScore(){
-	textSize(125);
+	textSize(fSize);
 	fill(91);
 	stroke(0);
 	text(p1Score,Width/6,Height/6);
-	text(p1Score,Width/1.25,Height/6);
+	text(p2Score,Width/1.25,Height/6);
 }
 
 
@@ -118,7 +126,8 @@ function drawFrame() {
 	pos.paddles[ID].x = nValues.x;
 	pos.paddles[ID].y = nValues.y;
 	if(!ball){
-		ball = new Ball(ID,arena.centerX,arena.centerY, randomX(), randomY(), BALL_SPEED);
+		let p = randomD();
+		ball = new Ball(ID,arena.centerX,arena.centerY, p.x, p.y, BALL_SPEED);
 	}
 	if (ball.id === ID && ID === 0) {
 		ball.move();
@@ -127,28 +136,23 @@ function drawFrame() {
 		let nValues = NORMALIZER(ball.x, ball.y);
 		pos.ball.x = nValues.x;
 		pos.ball.y = nValues.y;
-		if (ball.x - ball.radius < arena.xMin){
-			p1Score++;
-			console.log("Lost Ball.");
-			ball = null;
-		}
-		else if(ball.x + ball.radius > arena.xMax) {
-			p2Score++;
-			console.log("Lost Ball.");
-			ball = null;
-		}
 	}else{
 		let dValues = DENORMALIZER(pos.ball.x, pos.ball.y);
 		ball.set(dValues.x,dValues.y);
 	}
 }
 
-function randomX() {
-	return Math.random() > 0.5 ? -1 : 1;
-}
-
-function randomY() {
-	return Math.random() > 0.5 ? -1 : 1;
+function randomD() {
+	let x;
+	let y;
+	if(Math.random() > 0.5){
+		x = Math.random() > 0.5 ? -1 : 1;
+		y = Math.random() + 0.25;
+	}else{
+		y = Math.random() > 0.5 ? -1 : 1;
+		x = Math.random() + 0.25;
+	}
+	return {x:x,y:y};
 }
 
 function NORMALIZER(x, y) {

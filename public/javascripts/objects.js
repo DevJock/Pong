@@ -42,24 +42,33 @@ class Paddle {
 		stroke(255);
 		strokeWeight(1);
 		fill(255);
+		stroke(0,255,0);
+		if(this.id == 0){
+			line(this.tMax+1,this.lMin,this.tMax+1,this.lMax);
+		}else{
+			line(this.tMin-1,this.lMin,this.tMin-1,this.lMax);
+		}
+		stroke(255);
+		noFill();
 		rect(this.x, this.y, PADDLE_THICKNESS, PADDLE_LENGTH);
 	}
 
 	set(x,y) {
 		this.x = x;
 		this.y = y;
+		this.computeBoundaries();
 		this.draw();
 	}
 
 	rescale() {
 		switch (this.id) {
 			case 0: {
-				this.x = this.arena.xMin + PADDLE_THICKNESS / 2;
+				this.x = this.arena.xMin + this.arena.offset;
 				this.y = this.arena.centerY;
 			} break;
 			case 1: {
-				this.x = arena.xMax - PADDLE_THICKNESS / 2;
-				this.y = arena.centerY;
+				this.x = this.arena.xMax - this.arena.offset;
+				this.y = this.arena.centerY;
 
 			} break;
 		}
@@ -78,7 +87,7 @@ class Paddle {
 			case 0:
 			case 1: {
 				this.y += y * this.speed;
-				this.y = constrain(this.y, arena.yMin + PADDLE_LENGTH / 2, arena.yMax - PADDLE_LENGTH / 2);
+				this.y = constrain(this.y, this.arena.yMin + PADDLE_LENGTH / 2, this.arena.yMax - PADDLE_LENGTH / 2);
 			}; break;
 		}
 		this.computeBoundaries();

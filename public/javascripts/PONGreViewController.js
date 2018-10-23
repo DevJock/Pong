@@ -68,6 +68,12 @@ angular
         $state.go('game');
     }
 
+    $scope.end = function(){
+        $scope.score1 = "P1: "+p1Score;
+        $scope.score2 = "P2: "+p2Score;
+        $state.go('gameover');
+    }
+
     $scope.connect = function (id) {
         let opponent;
         CLIENTS.forEach(client => {

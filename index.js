@@ -84,7 +84,7 @@ io.on('connection', function (socket) {
         let session = { id: sessionCount++, p1: p1, p2: p2, p1score: 0, p2score: 0, p1ID: 0, p2ID: 1, pos: { ball: { x: 0.5, y: 0.5 }, paddles: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] }, p1Socket: p1Socket, p2Socket: p2Socket };
 
         // client copy of the server session that we will be sending to both players
-        let syncData = { id: session.id, p1:session.p1,p2: session.p2, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
+        let syncData = { id: session.id, p1: session.p1, p2: session.p2, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
 
         // every client waiting for a game gets a new updated clients database and also a list of players currently active in a session
         updateClients();
@@ -102,12 +102,25 @@ io.on('connection', function (socket) {
         let session;
         // First we find the game session where our client is playing
         session = sessionObjForID(moveData.id, true);
-        if (!session) {
+
+        if(!session){
             return;
         }
+
         session.pos = moveData.pos;
+        if(moveData.gID == 0){
+            if (session.pos.ball.x < -0.1 || session.pos.ball.x > 1.1) {
+                if (session.pos.ball.x < -0.1) {
+                    session.p2score++;
+                }
+                else if (session.pos.ball.x > 1.1) {
+                    session.p1score++;
+                }
+                session.p1Socket.emit('reset');
+            }
+        }
         // we synchronize the grid data from the client
-        let syncData = { id: session.id, p1:session.p1,p2: session.p2, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
+        let syncData = { id: session.id, p1: session.p1, p2: session.p2, p1score: session.p1score, p2score: session.p2score, p1ID: session.p1ID, p2ID: session.p2ID, pos: session.pos };
         session.p1Socket.emit('syncClient', { session: syncData });
         session.p2Socket.emit('syncClient', { session: syncData });
         sessions.push(session);
@@ -139,7 +152,7 @@ io.on('connection', function (socket) {
             // we transfer the opponent to active database and send him updates
             let client = playerObjForID(removedClient.id === session.p1.id ? session.p2.id : session.p1.id, true);
             clients.push(client);
-            socketObjForClientWithID(client.id).socket.emit('exited', { p1score: session.p1score, p2score: session.p2score });
+            socketObjForClientWithID(client.id).socket.emit('end', { p1score: session.p1score, p2score: session.p2score });
             updateClients();
             return;
         };

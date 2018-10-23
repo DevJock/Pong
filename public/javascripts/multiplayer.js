@@ -63,8 +63,9 @@ socket.on('play', function (server) {
 	else{
 		ID = server.session.p2ID;
 	}
+	console.log("Game Started");
 	scope.game();
-	scope.$apply();
+	scope.$apply();	
 });
 
 
@@ -72,26 +73,22 @@ socket.on('syncClient', function (server) {
 	p1Score = server.session.p1score;
 	p2Score = server.session.p2score;
 	pos = server.session.pos;
-	if (!pos) {
-		socket.emit('reset', { id: sessionID });
-	}
 });
 
-
-socket.on('exited', function (server) {
-	console.log("Opponent Disconnected");
-	p1Score = server.p1score;
-	p2Score = server.p2score;
-	gameStarted = false;
+socket.on('reset', function () {
+	ball = null;
 });
+
 
 
 socket.on('end', function (server) {
 	console.log("GameOver");
-	p1Score = server.session.p1score;
-	p2Score = server.session.p2score;
-	scope.showDiscovery();
-	scope.$apply();
+	p1Score = server.p1score;
+	p2Score = server.p2score;
+	gameStarted = false;
+	gameOver = true;
+	scope.end();
+	scope.$apply();	
 });
 
 
@@ -109,7 +106,7 @@ function PLAY(opponent) {
 }
 
 function SYNC(){
-	socket.emit('sync', { id: sessionID, pos:pos});
+	socket.emit('sync', {gID: ID, id: sessionID, pos:pos});
 }
 
 function REFRESH(){

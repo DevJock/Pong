@@ -3,17 +3,21 @@
  	© 2018 Chiraag Bangera.
     This is one of the partial HTML based template file which helps with the angular MVC framework
 -->
+
+
+
+
+
 <div class="text-center">
+    <div id="message" class="jumbotron jumbotron-fluid" style="display:block; background: rgb(30, 30, 30)">
+        <div class="container text-center">
+            <h1 class="display-4">Game Over</h1>
+            <p class="lead">Opponent Disconnected | Thanks for Playing.</p>
+            <h1 class="display-6">{{score1}} | {{score2}}</h1>
+        </div>
+    </div>
     <p>
-        <h3>Player Disconnected. Thanks for Playing.</h3>
-    </p>
-    <h1 class="display-6">SocreBoard</h1>
-    <h1 class="display-6">X:{{xscore}} | O:{{oscore}}</h1>
-    <h4>
-        <p>{{gomessage}}</p>
-    </h4>
-    <p>
-        <h4>Click button to find another session</h4>
+        <h4>Stay on this page or Click below to find another session</h4>
         <a ng-click="reboot()" class="btn btn-primary">Play Again</a>
     </p>
 </div>
