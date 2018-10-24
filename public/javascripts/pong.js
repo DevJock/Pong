@@ -39,7 +39,7 @@ function STARTGAME() {
 	rectMode(CENTER);
 	angleMode(DEGREES);
 	frameRate(60);
-	arena = new Arena(1,true);
+	arena = new Arena(1);
 	paddles.push(new Paddle(paddles.length, arena, PADDLE_SPEED));
 	paddles.push(new Paddle(paddles.length, arena, PADDLE_SPEED));
 	rescale();
