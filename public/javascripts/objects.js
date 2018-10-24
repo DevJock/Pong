@@ -42,14 +42,6 @@ class Paddle {
 		stroke(255);
 		strokeWeight(1);
 		fill(255);
-		stroke(0,255,0);
-		if(this.id == 0){
-			line(this.tMax+1,this.lMin,this.tMax+1,this.lMax);
-		}else{
-			line(this.tMin-1,this.lMin,this.tMin-1,this.lMax);
-		}
-		stroke(255);
-		noFill();
 		rect(this.x, this.y, PADDLE_THICKNESS, PADDLE_LENGTH);
 	}
 
